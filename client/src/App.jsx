@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Chatbot from "./pages/Chatbot";
-import SignIn from "./auth/SignIn";
+import Locator from "./pages/Locator";
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -17,13 +17,12 @@ const App = () => {
       .catch((err) => console.error("Error fetching from Flask:", err));
   }, []);
 
-  if (!auth) return <SignIn authorizeUser={authorizeUser} />;
-
   return (
     <div>
       <h1>React + Flask Connected ✅</h1>
       <p>{data ? data : "Loading Flask API..."}</p>
       <Chatbot />
+      <Locator />
     </div>
   );
 };

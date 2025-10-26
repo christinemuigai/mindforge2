@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -8,38 +8,18 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Load environment variables
+    # Load environment variables and create Groq client
     load_dotenv()
-    api_key = os.getenv("GROQ_API_KEY")
-    client = Groq(api_key=api_key)
+    groq_api_key = os.getenv("GROQ_API_KEY")
+    groq_client = Groq(api_key=groq_api_key)
+    app.config['groq_client'] = groq_client
 
-    @app.route('/api/hello')
-    def hello():
-        return jsonify(message="Hello from Flask + Groq connected!")
+    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    app.config['google_maps_api_key'] = google_maps_api_key
 
-    @app.route('/api/chat', methods=['POST'])
-    def chat():
-        """Handle messages from the frontend and generate a Groq response."""
-        data = request.get_json()
-        user_message = data.get("message", "")
-
-        if not user_message:
-            return jsonify({"error": "No message provided"}), 400
-
-        try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": "You are MamaCare AI, a friendly maternal and child health assistant."},
-                    {"role": "user", "content": user_message}
-                ],
-            )
-
-            ai_message = response.choices[0].message.content
-            return jsonify({"reply": ai_message})
-
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
+    # Register routes blueprint
+    from .routes import bp as routes_bp
+    app.register_blueprint(routes_bp)
 
     return app
 

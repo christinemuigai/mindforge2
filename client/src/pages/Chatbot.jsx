@@ -191,7 +191,6 @@ export default function Chatbot() {
 }
   */
 
-
 import React, { useState } from "react";
 import { FiSend, FiMapPin, FiHeart, FiRefreshCcw } from "react-icons/fi";
 import { AiOutlinePaperClip, AiOutlinePicture } from "react-icons/ai";
@@ -242,7 +241,10 @@ export default function Chatbot() {
 
       if (data.reply) {
         // ✅ add AI reply to chat
-        setChatHistory((prev) => [...prev, { sender: "bot", text: data.reply }]);
+        setChatHistory((prev) => [
+          ...prev,
+          { sender: "bot", text: data.reply },
+        ]);
       } else if (data.error) {
         setChatHistory((prev) => [
           ...prev,
@@ -279,7 +281,10 @@ export default function Chatbot() {
             size={22}
             className="hover:text-purple-500 cursor-pointer"
           />
-          <FiMapPin size={22} className="hover:text-purple-500 cursor-pointer" />
+          <FiMapPin
+            size={22}
+            className="hover:text-purple-500 cursor-pointer"
+          />
         </div>
       </aside>
 
@@ -319,34 +324,6 @@ export default function Chatbot() {
             <FiRefreshCcw className="mr-2" /> Refresh Prompts
           </button>
 
-          {/* ✅ Chat Box */}
-          <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm p-4 h-64 overflow-y-auto text-left">
-            {chatHistory.length === 0 ? (
-              <p className="text-gray-400 text-sm text-center mt-20">
-                Your chat will appear here...
-              </p>
-            ) : (
-              chatHistory.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`my-2 flex ${
-                    msg.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`px-4 py-2 rounded-xl text-sm max-w-xs ${
-                      msg.sender === "user"
-                        ? "bg-purple-600 text-white rounded-br-none"
-                        : "bg-gray-100 text-gray-700 rounded-bl-none"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
           {/* Input Section */}
           <div className="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between">
             <input
@@ -382,6 +359,33 @@ export default function Chatbot() {
             Save Chat
           </button>
 
+          {/* ✅ Chat Box */}
+          <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm p-4 h-64 overflow-y-auto text-left">
+            {chatHistory.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center mt-20">
+                Your chat will appear here...
+              </p>
+            ) : (
+              chatHistory.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`my-2 flex ${
+                    msg.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`px-4 py-2 rounded-xl text-sm max-w-xs ${
+                      msg.sender === "user"
+                        ? "bg-purple-600 text-white rounded-br-none"
+                        : "bg-gray-100 text-gray-700 rounded-bl-none"
+                    }`}
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
           {/* Healthcare Selector */}
           <div className="mt-10 text-left space-y-6">
             <div>
@@ -437,13 +441,7 @@ export default function Chatbot() {
           alt="User"
           className="w-10 h-10 rounded-full border border-gray-300"
         />
-      </div>    
-        </div>
-
-    
+      </div>
+    </div>
   );
 }
-      
-      
-
-
