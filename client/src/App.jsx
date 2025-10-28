@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Chatbot from "./pages/Chatbot";
 import Locator from "./pages/Locator";
+import Navbar from "./comoponents/Navbar";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom"
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -18,12 +20,19 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <h1>React + Flask Connected ✅</h1>
-      <p>{data ? data : "Loading Flask API..."}</p>
-      <Chatbot />
-      <Locator />
-    </div>
+    <>
+<div className="fixed bottom-6 right-6 bg-white shadow-2xl border border-purple-300 rounded-2xl p-4 w-[250px] text-center text-purple-700 animate-fadeIn z-50">
+  <h1 className="font-bold text-lg mb-1">React + Flask Connected ✅</h1>
+  <p className="text-sm">{data ? data : "Loading Flask API..."}</p>
+</div>
+<Router>
+      <Navbar/>
+      <Routes>
+        <Route path="chatbot" element={<Chatbot/>}/>
+        <Route path="locator" element={<Locator/>}/>
+      </Routes>
+    </Router>
+    </>
   );
 };
 
