@@ -107,8 +107,21 @@ export default function Locator() {
   }
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem" }}>
-      <h2>Hospital Locator</h2>
-      <button onClick={findHospitals} disabled={loading}>
+      <h2 style={{ marginBottom: "1rem" }}>Hospital Locator</h2>
+      <button
+        onClick={findHospitals}
+        disabled={loading}
+        style={{
+          backgroundColor: "#007bff",
+          color: "white",
+          padding: "10px 20px",
+          borderRadius: "5px",
+          border: "none",
+          cursor: "pointer",
+          fontSize: "16px",
+          marginBottom: "1rem",
+        }}
+      >
         {loading ? "Finding Hospitals..." : "Find Nearby Hospitals"}
       </button>
 

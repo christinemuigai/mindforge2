@@ -22,10 +22,7 @@ const App = () => {
 
   return (
     <>
-<div className="fixed bottom-6 right-6 bg-white shadow-2xl border border-purple-300 rounded-2xl p-4 w-[250px] text-center text-purple-700 animate-fadeIn z-50">
-  <h1 className="font-bold text-lg mb-1">React + Flask Connected ✅</h1>
-  <p className="text-sm">{data ? data : "Loading Flask API..."}</p>
-</div>
+
 <Router>
       <Navbar/>
       <Routes>
