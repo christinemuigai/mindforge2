@@ -18,12 +18,7 @@ export default function Dashboard() {
           Your trusted companion in promoting the health and well-being of mothers and children.  
           Mama Care provides health insights, SHA insurance guidance, and hospital location tools.
         </p>
-        <motion.button
-          className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-full text-lg shadow-lg transition-transform transform hover:scale-105"
-          whileHover={{ scale: 1.05 }}
-        >
-          Get Started
-        </motion.button>
+        
       </section>
 
       {/* About Section */}

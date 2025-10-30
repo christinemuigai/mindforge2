@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import Chatbot from "./pages/Chatbot";
 import Locator from "./pages/Locator";
 import Navbar from "./comoponents/Navbar";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-
+import Insuranceprovider from "./pages/Insuranceprovider";
 const App = () => {
   const [auth, setAuth] = useState(false);
   const [data, setData] = useState(null);
@@ -22,15 +22,15 @@ const App = () => {
 
   return (
     <>
-
-<Router>
-      <Navbar/>
-      <Routes>
-        <Route path="chatbot" element={<Chatbot/>}/>
-        <Route path="locator" element={<Locator/>}/>
-        <Route path="/" element={<Dashboard/>}/>
-      </Routes>
-    </Router>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="insurance" element={<Insuranceprovider />} />
+          <Route path="chatbot" element={<Chatbot />} />
+          <Route path="locator" element={<Locator />} />
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </Router>
     </>
   );
 };
