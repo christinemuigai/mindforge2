@@ -21,7 +21,7 @@ const Navbar = () => {
           <Link className="hover:text-purple-200 transition" to="/">Dashboard</Link>
           <Link className="hover:text-purple-200 transition" to="/chatbot">ChatBot</Link>
           <Link className="hover:text-purple-200 transition" to="/locator">Location</Link>
-          <Link className="hover:text-purple-200 transition" to="/insuranceprovider">Insurance</Link>
+          <Link className="hover:text-purple-200 transition" to="/insurance">Insurance</Link>
         </div>
 
         {/* Logout Button (Desktop) */}

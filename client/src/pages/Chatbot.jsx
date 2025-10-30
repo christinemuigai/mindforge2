@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { FiSend, FiMapPin, FiHeart, FiRefreshCcw } from "react-icons/fi";
+import React, { useState, useRef } from "react";
+import { FiSend, FiMapPin, FiHeart, FiRefreshCcw, FiX } from "react-icons/fi";
 import { AiOutlinePaperClip, AiOutlinePicture } from "react-icons/ai";
 import { MdLocalHospital } from "react-icons/md";
 
 export default function Chatbot() {
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [selectedInsurance, setSelectedInsurance] = useState("");
   const [selectedFacility, setSelectedFacility] = useState("");
   const [chatHistory, setChatHistory] = useState([]); // ✅ stores chat messages
+  const fileInputRef = useRef(null);
 
   const commonPrompts = [
     "I’m feeling dizzy and weak during pregnancy",
@@ -32,22 +35,32 @@ export default function Chatbot() {
   ];
 
   const handleSend = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() && !image) return;
 
-    // add user message to chat
-    setChatHistory((prev) => [...prev, { sender: "user", text: message }]);
+    const userMessagePayload = { sender: "user", text: message };
+    if (imagePreview) {
+      userMessagePayload.image = imagePreview;
+    }
+    setChatHistory((prev) => [...prev, userMessagePayload]);
+
+    const formData = new FormData();
+    formData.append("message", message);
+    if (image) {
+      formData.append("image", image);
+    }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/chat-with-image",
+        {
+          method: "POST",
+          body: formData, // No 'Content-Type' header, browser sets it for FormData
+        }
+      );
 
       const data = await response.json();
 
       if (data.reply) {
-        // ✅ add AI reply to chat
         setChatHistory((prev) => [
           ...prev,
           { sender: "bot", text: data.reply },
@@ -67,12 +80,33 @@ export default function Chatbot() {
     }
 
     setMessage("");
+    setImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   // ✅ optional Save button handler (could later save chat to backend or localStorage)
   const handleSave = () => {
     console.log("Chat saved:", chatHistory);
     alert("Chat saved successfully!");
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -132,30 +166,64 @@ export default function Chatbot() {
           </button>
 
           {/* Input Section */}
-          <div className="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between">
-            <input
-              type="text"
-              placeholder="Describe your symptom or question…"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="flex-1 text-gray-700 placeholder-gray-400 outline-none bg-transparent text-sm"
-              maxLength={1000}
-            />
-            <div className="flex items-center space-x-3 text-gray-400">
-              <button className="hover:text-purple-500">
-                <AiOutlinePaperClip size={20} />
-              </button>
-              <button className="hover:text-purple-500">
-                <AiOutlinePicture size={20} />
-              </button>
-              <div className="text-gray-400 text-xs">{message.length}/1000</div>
-              <button
-                onClick={handleSend}
-                className="bg-purple-600 text-white rounded-lg p-2 hover:bg-purple-700"
-              >
-                <FiSend size={18} />
-              </button>
+          <div className="mt-6">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between">
+              <input
+                type="text"
+                placeholder="Describe your symptom or question…"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                className="flex-1 text-gray-700 placeholder-gray-400 outline-none bg-transparent text-sm"
+                maxLength={1000}
+              />
+              <div className="flex items-center space-x-3 text-gray-400">
+                <button className="hover:text-purple-500">
+                  <AiOutlinePaperClip size={20} />
+                </button>
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="hover:text-purple-500"
+                >
+                  <AiOutlinePicture size={20} />
+                </button>
+                <div className="text-gray-400 text-xs">
+                  {message.length}/1000
+                </div>
+                <button
+                  onClick={handleSend}
+                  className="bg-purple-600 text-white rounded-lg p-2 hover:bg-purple-700 disabled:bg-purple-300"
+                  disabled={!message.trim() && !image}
+                >
+                  <FiSend size={18} />
+                </button>
+              </div>
             </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+            />
+            {imagePreview && (
+              <div className="mt-2 p-2 bg-gray-100 rounded-lg flex items-center justify-between text-sm">
+                <div className="flex items-center">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-10 h-10 rounded-md object-cover mr-3"
+                  />
+                  <span className="text-gray-600">{image.name}</span>
+                </div>
+                <button
+                  onClick={removeImage}
+                  className="text-gray-500 hover:text-red-500"
+                >
+                  <FiX size={18} />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* ✅ Save Button */}
@@ -187,7 +255,14 @@ export default function Chatbot() {
                         : "bg-gray-100 text-gray-700 rounded-bl-none"
                     }`}
                   >
-                    {msg.text}
+                    {msg.image && (
+                      <img
+                        src={msg.image}
+                        alt="User upload"
+                        className="rounded-lg mb-2 max-w-full h-auto"
+                      />
+                    )}
+                    {msg.text && <div>{msg.text}</div>}
                   </div>
                 </div>
               ))
