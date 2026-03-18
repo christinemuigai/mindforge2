@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chatbot from "./pages/Chatbot";
 import Locator from "./pages/Locator";
 import Navbar from "./comoponents/Navbar";
+import QuickExit from "./comoponents/QuickExit";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Insuranceprovider from "./pages/Insuranceprovider";
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="locator" element={<Locator />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
+        <QuickExit />
       </Router>
     </>
   );

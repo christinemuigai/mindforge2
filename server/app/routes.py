@@ -106,31 +106,33 @@ def nearby_hospitals():
     if not api_key:
         return jsonify({"error": "Google Maps API key not configured"}), 500
 
-    url = (
-        "https://places.googleapis.com/v1/places:searchNearby"
-    )
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
-    payload = {
-        "includedTypes": ["hospital"],
-        "maxResultCount": 10,
-        "locationRestriction": {
-            "circle": {
-                "center": {"latitude": lat, "longitude": lng},
-                "radius": 5000.0
-            }
-        },
-        "rankPreference": "DISTANCE"
-    }
-
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': api_key,
-        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.id,places.location'
+    params = {
+        "location": f"{lat},{lng}",
+        "radius": 5000,
+        "type": "hospital",
+        "key": api_key
     }
 
     try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()  # Raise an exception for bad status codes
-        return jsonify(response.json())
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        # Transform legacy response to a cleaner format
+        places = []
+        for result in data.get("results", []):
+            places.append({
+                "displayName": {"text": result.get("name", "")},
+                "formattedAddress": result.get("vicinity", ""),
+                "id": result.get("place_id", ""),
+                "location": {
+                    "latitude": result.get("geometry", {}).get("location", {}).get("lat"),
+                    "longitude": result.get("geometry", {}).get("location", {}).get("lng")
+                }
+            })
+
+        return jsonify({"places": places})
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500

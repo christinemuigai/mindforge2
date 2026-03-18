@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { BsFillHospitalFill } from "react-icons/bs";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 
@@ -18,10 +18,38 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-6 text-lg font-medium">
-          <Link className="hover:text-purple-200 transition" to="/">Dashboard</Link>
-          <Link className="hover:text-purple-200 transition" to="/chatbot">ChatBot</Link>
-          <Link className="hover:text-purple-200 transition" to="/locator">Location</Link>
-          <Link className="hover:text-purple-200 transition" to="/insurance">Insurance</Link>
+          <NavLink 
+            to="/" 
+            className={({ isActive }) => 
+              `transition-all duration-200 border-b-2 py-1 ${isActive ? "text-purple-100 border-purple-200" : "text-white border-transparent hover:text-purple-200 hover:border-purple-300"}`
+            }
+          >
+            Dashboard
+          </NavLink>
+          <NavLink 
+            to="/chatbot" 
+            className={({ isActive }) => 
+              `transition-all duration-200 border-b-2 py-1 ${isActive ? "text-purple-100 border-purple-200" : "text-white border-transparent hover:text-purple-200 hover:border-purple-300"}`
+            }
+          >
+            ChatBot
+          </NavLink>
+          <NavLink 
+            to="/locator" 
+            className={({ isActive }) => 
+              `transition-all duration-200 border-b-2 py-1 ${isActive ? "text-purple-100 border-purple-200" : "text-white border-transparent hover:text-purple-200 hover:border-purple-300"}`
+            }
+          >
+            Location
+          </NavLink>
+          <NavLink 
+            to="/insurance" 
+            className={({ isActive }) => 
+              `transition-all duration-200 border-b-2 py-1 ${isActive ? "text-purple-100 border-purple-200" : "text-white border-transparent hover:text-purple-200 hover:border-purple-300"}`
+            }
+          >
+            Insurance
+          </NavLink>
         </div>
 
         {/* Logout Button (Desktop) */}
@@ -41,11 +69,11 @@ const Navbar = () => {
 
       {/* Mobile Dropdown */}
       {open && (
-        <div className="md:hidden bg-purple-700 text-white py-4 px-6 flex flex-col gap-4 text-lg font-medium">
-          <Link onClick={() => setOpen(false)} className="hover:text-purple-200" to="/">Dashboard</Link>
-          <Link onClick={() => setOpen(false)} className="hover:text-purple-200" to="/chatbot">ChatBot</Link>
-          <Link onClick={() => setOpen(false)} className="hover:text-purple-200" to="/locator">Location</Link>
-          <Link onClick={() => setOpen(false)} className="hover:text-purple-200" to="/insuranceprovider">Insurance</Link>
+        <div className="md:hidden bg-purple-700 text-white py-4 px-6 flex flex-col gap-4 text-lg font-medium shadow-inner">
+          <NavLink onClick={() => setOpen(false)} to="/" className={({ isActive }) => `block py-2 px-3 rounded-lg transition-colors ${isActive ? "bg-purple-800 text-purple-100" : "hover:bg-purple-600 hover:text-purple-100"}`}>Dashboard</NavLink>
+          <NavLink onClick={() => setOpen(false)} to="/chatbot" className={({ isActive }) => `block py-2 px-3 rounded-lg transition-colors ${isActive ? "bg-purple-800 text-purple-100" : "hover:bg-purple-600 hover:text-purple-100"}`}>ChatBot</NavLink>
+          <NavLink onClick={() => setOpen(false)} to="/locator" className={({ isActive }) => `block py-2 px-3 rounded-lg transition-colors ${isActive ? "bg-purple-800 text-purple-100" : "hover:bg-purple-600 hover:text-purple-100"}`}>Location</NavLink>
+          <NavLink onClick={() => setOpen(false)} to="/insurance" className={({ isActive }) => `block py-2 px-3 rounded-lg transition-colors ${isActive ? "bg-purple-800 text-purple-100" : "hover:bg-purple-600 hover:text-purple-100"}`}>Insurance</NavLink>
           <button className="bg-white text-purple-700 font-semibold px-4 py-2 rounded-lg hover:bg-purple-100 transition">
             Log Out
           </button>
