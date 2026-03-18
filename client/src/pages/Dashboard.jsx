@@ -1,24 +1,50 @@
 import React from "react";
 import { motion } from "framer-motion";
+import heroImage from "../assets/dashboard.png"
 
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-purple-50 text-gray-800">
       {/* Hero Section */}
-      <section className="text-center py-20 px-6 bg-gradient-to-b from-purple-100 to-purple-50">
-        <motion.h1
-          className="text-5xl font-extrabold text-purple-700 mb-6 leading-tight"
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          Welcome to <span className="text-purple-800">Mama Care</span>
-        </motion.h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-          Your trusted companion in promoting the health and well-being of mothers and children.  
-          Mama Care provides health insights, SHA insurance guidance, and hospital location tools.
-        </p>
-        
+      <section className="py-20 px-6 bg-gradient-to-b from-purple-100 to-purple-50">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+          {/* LEFT: TEXT */}
+          <div className="flex-1 text-center md:text-left">
+            <motion.h1
+              className="text-5xl md:text-6xl font-extrabold text-purple-700 mb-6 leading-tight drop-shadow-sm"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+               <span className="text-purple-800">Mama Care</span>
+            </motion.h1>
+            <motion.p 
+              className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto md:mx-0 mb-8 leading-relaxed"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              Empowering Kenyan Mothers with Better Health and Care Access.
+            </motion.p>
+          </div>
+
+          {/* RIGHT: IMAGE */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex-1 flex justify-center md:justify-end"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-purple-300 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+              <img
+                src={heroImage}
+                alt="Mama Care illustration"
+                className="relative w-full max-w-lg object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* About Section */}
