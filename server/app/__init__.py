@@ -23,6 +23,9 @@ def create_app():
     from .hospital_routes import hospital_bp
     app.register_blueprint(chat_bp)
     app.register_blueprint(hospital_bp)
+    @app.route("/")
+    def home():
+        return "MindForge API is live 🚀"
 
     return app
 
