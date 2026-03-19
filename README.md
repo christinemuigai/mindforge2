@@ -77,7 +77,7 @@ The application consists of a `client` (frontend) and a `server` (backend). You 
 
     ```env
     GROQ_API_KEY=
-    GOOGLE_MAPS_API_KEY=
+   
     ```
 
 5.  **Run the server application:**

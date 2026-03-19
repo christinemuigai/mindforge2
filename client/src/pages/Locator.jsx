@@ -1,28 +1,58 @@
-import React, { useState, useEffect } from "react";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  InfoWindow,
-} from "@react-google-maps/api";
+import React, { useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import "leaflet-routing-machine";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
+// Fix for default marker icon in leaflet with webpack
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+function Routing({ source, destination }) {
+  const map = useMap();
+
+  React.useEffect(() => {
+    if (!map || !source || !destination) return;
+
+    const routingControl = L.Routing.control({
+      waypoints: [
+        L.latLng(source.lat, source.lng),
+        L.latLng(destination.lat, destination.lng),
+      ],
+      routeWhileDragging: false,
+      addWaypoints: false,
+      fitSelectedRoutes: true,
+      showAlternatives: false,
+      lineOptions: {
+        styles: [{ color: "#007bff", weight: 4 }],
+      },
+      createMarker: () => null, // Hide default routing markers as we already have ours
+    }).addTo(map);
+
+    return () => map.removeControl(routingControl);
+  }, [map, source, destination]);
+
+  return null;
+}
 
 export default function Locator() {
   const [hospitals, setHospitals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [apiKey, setApiKey] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedHospital, setSelectedHospital] = useState(null);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/maps-key")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.apiKey) setApiKey(data.apiKey);
-        else setError("Could not fetch Google Maps API key.");
-      })
-      .catch(() => setError("Could not fetch Google Maps API key."));
-  }, []);
 
   const findHospitals = () => {
     setLoading(true);
@@ -87,24 +117,16 @@ export default function Locator() {
     borderRadius: "8px",
   };
 
-  const handleGetDirections = () => {
-    if (!selectedHospital || !userLocation) return;
+  const handleGetDirections = (hospital) => {
+    if (!userLocation || !hospital) return;
 
     const origin = `${userLocation.lat},${userLocation.lng}`;
-    const destination = `${selectedHospital.location.latitude},${selectedHospital.location.longitude}`;
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    const destination = `${hospital.location.latitude},${hospital.location.longitude}`;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
 
-    window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  if (!apiKey) {
-    return (
-      <div style={{ fontFamily: "sans-serif", padding: "1rem" }}>
-        <h2>Hospital Locator</h2>
-        <p>{error || "Loading Map..."}</p>
-      </div>
-    );
-  }
   return (
     <div style={{ fontFamily: "sans-serif", padding: "1rem" }}>
       <h2 style={{ marginBottom: "1rem" }}>Hospital Locator</h2>
@@ -127,54 +149,55 @@ export default function Locator() {
 
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
-      <LoadScript googleMapsApiKey={apiKey}>
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={userLocation || { lat: 34.0522, lng: -118.2437 }} // Default to LA
-          zoom={userLocation ? 13 : 8}
+      {userLocation && (
+        <MapContainer
+          center={[userLocation.lat, userLocation.lng]}
+          zoom={13}
+          style={mapContainerStyle}
         >
-          {userLocation && (
-            <Marker position={userLocation} title="Your Location" />
-          )}
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          
+          <Marker position={[userLocation.lat, userLocation.lng]}>
+            <Popup>You are here</Popup>
+          </Marker>
+
           {hospitals.map((hospital) => (
             <Marker
               key={hospital.id}
-              position={{
-                lat: hospital.location.latitude,
-                lng: hospital.location.longitude,
+              position={[hospital.location.latitude, hospital.location.longitude]}
+              eventHandlers={{
+                click: () => setSelectedHospital(hospital),
               }}
-              onClick={() => setSelectedHospital(hospital)}
-            />
-          ))}
-
-          {selectedHospital && (
-            <InfoWindow
-              position={{
-                lat: selectedHospital.location.latitude,
-                lng: selectedHospital.location.longitude,
-              }}
-              onCloseClick={() => setSelectedHospital(null)}
             >
-              <div>
-                <strong>{selectedHospital.displayName.text}</strong>
-                <p>{selectedHospital.formattedAddress}</p>
-                <button
-                  onClick={handleGetDirections}
-                  style={{ marginTop: "8px" }}
-                  disabled={!userLocation}
-                  title={
-                    !userLocation
-                      ? "Cannot get directions without your location"
-                      : "Get directions"
-                  }
-                >
-                  Get Directions
-                </button>
-              </div>
-            </InfoWindow>
+              <Popup>
+                <div>
+                  <strong>{hospital.displayName.text}</strong>
+                  <p>{hospital.formattedAddress}</p>
+                  <button
+                    onClick={() => handleGetDirections(hospital)}
+                    style={{ marginTop: "8px" }}
+                  >
+                    Open in Google Maps
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+          
+          {selectedHospital && (
+            <Routing 
+              source={userLocation} 
+              destination={{ 
+                lat: selectedHospital.location.latitude, 
+                lng: selectedHospital.location.longitude 
+              }} 
+            />
           )}
-        </GoogleMap>
-      </LoadScript>
+        </MapContainer>
+      )}
 
       {hospitals.length > 0 && (
         <div>
@@ -189,16 +212,9 @@ export default function Locator() {
                   padding: "1rem",
                   marginBottom: "1rem",
                   cursor: "pointer",
+                  backgroundColor: selectedHospital?.id === hospital.id ? '#f0f8ff' : 'white'
                 }}
-                onClick={() => {
-                  const newCenter = {
-                    lat: hospital.location.latitude,
-                    lng: hospital.location.longitude,
-                  };
-                  setSelectedHospital(hospital);
-                  // Optional: Pan map to the hospital when its list item is clicked
-                  // setUserLocation(newCenter);
-                }}
+                onClick={() => setSelectedHospital(hospital)}
               >
                 <strong>{hospital.displayName.text}</strong>
                 <p>{hospital.formattedAddress}</p>

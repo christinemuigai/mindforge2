@@ -137,7 +137,7 @@ export default function Dashboard() {
               Nearest Hospital Finder
             </h3>
             <p className="text-gray-600">
-              Use our Google Maps feature to find the nearest hospital for you and your child with one tap.
+              Use our map feature to find the nearest hospital for you and your child with one tap.
             </p>
           </motion.div>
         </div>
