@@ -14,12 +14,15 @@ def create_app():
     groq_client = Groq(api_key=groq_api_key)
     app.config['groq_client'] = groq_client
 
-    google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    app.config['google_maps_api_key'] = google_maps_api_key
+    # Initialize extensions
+    from .extensions import limiter
+    limiter.init_app(app)
 
-    # Register routes blueprint
-    from .routes import bp as routes_bp
-    app.register_blueprint(routes_bp)
+    # Register blueprints
+    from .chat_routes import chat_bp
+    from .hospital_routes import hospital_bp
+    app.register_blueprint(chat_bp)
+    app.register_blueprint(hospital_bp)
 
     return app
 

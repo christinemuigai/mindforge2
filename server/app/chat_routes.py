@@ -1,14 +1,11 @@
 from flask import Blueprint, jsonify, request, current_app
-import requests
 import base64
+from .extensions import limiter
 
-bp = Blueprint('api', __name__)
+chat_bp = Blueprint('chat', __name__)
 
-@bp.route('/api/hello')
-def hello():
-    return jsonify(message="Hello from Flask + Groq connected Alex!")
-
-@bp.route('/api/chat', methods=['POST'])
+@chat_bp.route('/api/chat', methods=['POST'])
+@limiter.limit("10 per minute")
 def chat():
     if 'message' not in request.form:
         return jsonify({"error": "No message part"}), 400
@@ -32,7 +29,8 @@ def chat():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@bp.route('/api/chat-with-image', methods=['POST'])
+@chat_bp.route('/api/chat-with-image', methods=['POST'])
+@limiter.limit("10 per minute")
 def chat_with_image():
     user_message = request.form.get("message", "")
     image_file = request.files.get('image')
@@ -84,55 +82,4 @@ def chat_with_image():
         return jsonify({"reply": ai_message})
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@bp.route('/api/maps-key', methods=['GET'])
-def maps_key():
-    api_key = current_app.config.get('google_maps_api_key')
-    if not api_key:
-        return jsonify({"error": "Google Maps API key not configured"}), 500
-    return jsonify({"apiKey": api_key})
-
-@bp.route('/api/nearby-hospitals', methods=['POST'])
-def nearby_hospitals():
-    data = request.get_json() or {}
-    lat = data.get('lat')
-    lng = data.get('lng')
-
-    if not lat or not lng:
-        return jsonify({"error": "Latitude and longitude are required"}), 400
-
-    api_key = current_app.config.get('google_maps_api_key')
-    if not api_key:
-        return jsonify({"error": "Google Maps API key not configured"}), 500
-
-    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-
-    params = {
-        "location": f"{lat},{lng}",
-        "radius": 5000,
-        "type": "hospital",
-        "key": api_key
-    }
-
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-
-        # Transform legacy response to a cleaner format
-        places = []
-        for result in data.get("results", []):
-            places.append({
-                "displayName": {"text": result.get("name", "")},
-                "formattedAddress": result.get("vicinity", ""),
-                "id": result.get("place_id", ""),
-                "location": {
-                    "latitude": result.get("geometry", {}).get("location", {}).get("lat"),
-                    "longitude": result.get("geometry", {}).get("location", {}).get("lng")
-                }
-            })
-
-        return jsonify({"places": places})
-    except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500

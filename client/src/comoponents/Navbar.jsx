@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { BsFillHospitalFill } from "react-icons/bs";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import logo from "../assets/logo.png"
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -12,7 +13,7 @@ const Navbar = () => {
 
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <BsFillHospitalFill className="text-3xl" />
+          <img src ={logo} alt="mama care logo" className='h-12 w-20'/>
           <h1 className="text-2xl font-bold">Mama Care</h1>
         </div>
 
@@ -52,10 +53,7 @@ const Navbar = () => {
           </NavLink>
         </div>
 
-        {/* Logout Button (Desktop) */}
-        <button className="hidden md:block bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg hover:bg-purple-100 transition">
-          Log Out
-        </button>
+      
 
         {/* Mobile Menu Button */}
         <button
