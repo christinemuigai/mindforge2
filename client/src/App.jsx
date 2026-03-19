@@ -15,7 +15,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/hello")
+    fetch("https://mindforge2.onrender.com/api/hello")
       .then((res) => res.json())
       .then((data) => setData(data.message))
       .catch((err) => console.error("Error fetching from Flask:", err));

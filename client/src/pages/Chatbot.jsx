@@ -43,7 +43,7 @@ export default function Chatbot() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/chat-with-image",
+        "https://mindforge2.onrender.com/api/chat-with-image",
         { method: "POST", body: formData }
       );
       const data = await response.json();

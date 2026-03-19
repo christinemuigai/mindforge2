@@ -73,7 +73,7 @@ export default function Locator() {
         setUserLocation(userCoords);
 
         const response = await fetch(
-          "http://127.0.0.1:5000/api/nearby-hospitals",
+          "https://mindforge2.onrender.com/api/nearby-hospitals",
           {
             method: "POST",
             headers: {
